@@ -23,7 +23,6 @@ CREATE TABLE IF NOT EXISTS transactions
     receiver_id INT                NOT NULL,
     amount      DECIMAL(10, 2)     NOT NULL,
     timestamp   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (sender_id) REFERENCES user (id),
-    FOREIGN KEY (receiver_id) REFERENCES user (id)
-
+    CONSTRAINT fk_sender FOREIGN KEY (sender_id) REFERENCES user (id),
+    CONSTRAINT fk_receiver FOREIGN KEY (receiver_id) REFERENCES user (id)
 );
