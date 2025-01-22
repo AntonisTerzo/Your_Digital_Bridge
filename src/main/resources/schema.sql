@@ -3,8 +3,10 @@ CREATE TABLE IF NOT EXISTS user
     id         INT AUTO_INCREMENT NOT NULL PRIMARY KEY,
     first_name VARCHAR(255)       NOT NULL,
     last_name  VARCHAR(255)       NOT NULL,
+    email      VARCHAR(255)       NOT NULL UNIQUE,
     adress     VARCHAR(255)       NOT NULL,
-    balance    DECIMAL(10, 2)     NOT NULL
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS user_credentials
@@ -13,6 +15,8 @@ CREATE TABLE IF NOT EXISTS user_credentials
     username VARCHAR(255)       NOT NULL UNIQUE,
     password VARCHAR(255)       NOT NULL,
     user_id  INT                NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES user (id)
 );
 
