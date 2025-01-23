@@ -30,7 +30,8 @@ public class Transaction {
     private BigDecimal amount;
 
     @ColumnDefault("CURRENT_TIMESTAMP")
-    @Column(name = "timestamp")
+    @NotNull
+    @Column(name = "timestamp", nullable = false)
     private Instant timestamp;
 
     public Integer getId() {

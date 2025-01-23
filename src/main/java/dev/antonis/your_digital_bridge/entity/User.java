@@ -3,15 +3,16 @@ package dev.antonis.your_digital_bridge.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import org.hibernate.annotations.ColumnDefault;
 
-import java.math.BigDecimal;
+import java.time.Instant;
 
 @Entity
 @Table(name = "user", schema = "mydatabase")
 public class User {
     @Id
-    @Column(name = "id", nullable = false, updatable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false, updatable = false)
     private Integer id;
 
     @Size(max = 255)
@@ -26,12 +27,22 @@ public class User {
 
     @Size(max = 255)
     @NotNull
+    @Column(name = "email", nullable = false, unique = true)
+    private String email;
+
+    @Size(max = 255)
+    @NotNull
     @Column(name = "adress", nullable = false)
     private String adress;
 
+    @ColumnDefault("CURRENT_TIMESTAMP")
     @NotNull
-    @Column(name = "balance", nullable = false, precision = 10, scale = 2)
-    private BigDecimal balance;
+    @Column(name = "created_at", nullable = false)
+    private Instant createdAt;
+
+    @ColumnDefault("CURRENT_TIMESTAMP")
+    @Column(name = "updated_at")
+    private Instant updatedAt;
 
     public Integer getId() {
         return id;
@@ -57,6 +68,14 @@ public class User {
         this.lastName = lastName;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
     public String getAdress() {
         return adress;
     }
@@ -65,12 +84,19 @@ public class User {
         this.adress = adress;
     }
 
-    public BigDecimal getBalance() {
-        return balance;
+    public Instant getCreatedAt() {
+        return createdAt;
     }
 
-    public void setBalance(BigDecimal balance) {
-        this.balance = balance;
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
     }
 
+    public Instant getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Instant updatedAt) {
+        this.updatedAt = updatedAt;
+    }
 }

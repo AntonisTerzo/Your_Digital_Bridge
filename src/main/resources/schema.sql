@@ -5,17 +5,17 @@ CREATE TABLE IF NOT EXISTS user
     last_name  VARCHAR(255)       NOT NULL,
     email      VARCHAR(255)       NOT NULL UNIQUE,
     adress     VARCHAR(255)       NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS user_credentials
 (
-    id       INT AUTO_INCREMENT NOT NULL PRIMARY KEY,
-    username VARCHAR(255)       NOT NULL UNIQUE,
-    password VARCHAR(255)       NOT NULL,
-    user_id  INT                NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    id         INT AUTO_INCREMENT NOT NULL PRIMARY KEY,
+    username   VARCHAR(255)       NOT NULL UNIQUE,
+    password   VARCHAR(255)       NOT NULL,
+    user_id    INT                NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL ,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES user (id)
 );
@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS transactions
     sender_id   INT                NOT NULL,
     receiver_id INT                NOT NULL,
     amount      DECIMAL(10, 2)     NOT NULL,
-    timestamp   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    timestamp   TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     CONSTRAINT fk_sender FOREIGN KEY (sender_id) REFERENCES user (id),
     CONSTRAINT fk_receiver FOREIGN KEY (receiver_id) REFERENCES user (id)
 );
