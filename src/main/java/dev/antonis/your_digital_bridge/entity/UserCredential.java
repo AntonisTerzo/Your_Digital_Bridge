@@ -3,6 +3,9 @@ package dev.antonis.your_digital_bridge.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import org.hibernate.annotations.ColumnDefault;
+
+import java.time.Instant;
 
 @Entity
 @Table(name = "user_credentials", schema = "mydatabase")
@@ -14,7 +17,7 @@ public class UserCredential {
 
     @Size(max = 255)
     @NotNull
-    @Column(name = "username", nullable = false, updatable = false)
+    @Column(name = "username", nullable = false, unique = true)
     private String username;
 
     @Size(max = 255)
@@ -26,6 +29,15 @@ public class UserCredential {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    @ColumnDefault("CURRENT_TIMESTAMP")
+    @NotNull
+    @Column(name = "created_at", nullable = false)
+    private Instant createdAt;
+
+    @ColumnDefault("CURRENT_TIMESTAMP")
+    @Column(name = "updated_at")
+    private Instant updatedAt;
 
     public Integer getId() {
         return id;
@@ -59,4 +71,19 @@ public class UserCredential {
         this.user = user;
     }
 
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Instant getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Instant updatedAt) {
+        this.updatedAt = updatedAt;
+    }
 }
