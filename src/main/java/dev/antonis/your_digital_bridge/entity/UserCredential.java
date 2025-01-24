@@ -32,7 +32,7 @@ public class UserCredential {
 
     @ColumnDefault("CURRENT_TIMESTAMP")
     @NotNull
-    @Column(name = "created_at", nullable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
     @ColumnDefault("CURRENT_TIMESTAMP")
