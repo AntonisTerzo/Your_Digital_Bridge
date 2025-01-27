@@ -7,6 +7,7 @@ import dev.antonis.your_digital_bridge.user.repository.UserCredentialRepository;
 import dev.antonis.your_digital_bridge.user.repository.UserRepository;
 import dev.antonis.your_digital_bridge.user.dto.RegisterUserRequestDto;
 import jakarta.validation.Valid;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,14 +15,15 @@ import java.time.Instant;
 
 @Service
 public class AuthService {
-    // TODO: Add encryption for password
 
     private final UserRepository userRepository;
     private final UserCredentialRepository userCredentialRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public AuthService(UserRepository userRepository, UserCredentialRepository userCredentialRepository) {
+    public AuthService(UserRepository userRepository, UserCredentialRepository userCredentialRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.userCredentialRepository = userCredentialRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Transactional
@@ -44,7 +46,7 @@ public class AuthService {
 
         UserCredential userCredential = new UserCredential();
         userCredential.setUsername(requestDto.username());
-        userCredential.setPassword(requestDto.password()); //i will hash the password when i add security
+        userCredential.setPassword(passwordEncoder.encode(requestDto.password()));
         userCredential.setUser(savedUser);
         userCredential.setCreatedAt(Instant.now());
         userCredential.setUpdatedAt(Instant.now());

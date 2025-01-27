@@ -31,7 +31,7 @@ public class Transaction {
 
     @ColumnDefault("CURRENT_TIMESTAMP")
     @NotNull
-    @Column(name = "timestamp", nullable = false)
+    @Column(name = "timestamp", nullable = false, updatable = false)
     private Instant timestamp;
 
     public Integer getId() {
