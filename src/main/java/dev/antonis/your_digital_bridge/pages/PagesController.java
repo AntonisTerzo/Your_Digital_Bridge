@@ -85,4 +85,9 @@ public class PagesController {
         }
         return "redirect:/transfer";
     }
+
+    @GetMapping("/register")
+    public String getRegisterPage() {
+        return "register";
+    }
 }
