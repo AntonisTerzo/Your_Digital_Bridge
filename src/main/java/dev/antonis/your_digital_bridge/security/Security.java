@@ -2,12 +2,13 @@ package dev.antonis.your_digital_bridge.security;
 
 import dev.antonis.your_digital_bridge.security.jwt.AuthTokenFilter;
 import dev.antonis.your_digital_bridge.security.jwt.JwtUtils;
+import dev.antonis.your_digital_bridge.user.UserDetailsImpl;
 import dev.antonis.your_digital_bridge.user.UserDetailsServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -17,6 +18,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.http.ResponseCookie;
 
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
@@ -66,11 +68,21 @@ public class Security {
                         authorize
                                 .requestMatchers(GET, "/").permitAll()
                                 .requestMatchers(GET, "/login").permitAll()
-                                .requestMatchers(POST, "/login").permitAll()
                                 .requestMatchers(POST, "/api/auth/register").permitAll()
                                 .requestMatchers(POST, "/api/auth/login").permitAll()
-                                .anyRequest().denyAll())
-                .formLogin(Customizer.withDefaults())
+                                .requestMatchers(GET, "/me").authenticated()
+                                .anyRequest().authenticated())
+                .formLogin(formLogin -> formLogin
+                        .loginPage("/login")
+                        .loginProcessingUrl("/login")
+                        .successHandler((request, response, authentication) -> {
+                            UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+                            ResponseCookie jwtCookie = jtwUtils.generateJwtCookie(userDetails);
+                            response.addHeader(HttpHeaders.SET_COOKIE, jwtCookie.toString());
+                            response.sendRedirect("/me");
+                        })
+                        .failureUrl("/login?error")
+                        .permitAll())
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(exception ->
