@@ -68,9 +68,13 @@ public class Security {
                         authorize
                                 .requestMatchers(GET, "/").permitAll()
                                 .requestMatchers(GET, "/login").permitAll()
+                                .requestMatchers(GET, "/register").permitAll()
                                 .requestMatchers(POST, "/api/auth/register").permitAll()
                                 .requestMatchers(POST, "/api/auth/login").permitAll()
                                 .requestMatchers(GET, "/me").authenticated()
+                                .requestMatchers(POST, "/api/transactions/transfer").authenticated()
+                                .requestMatchers(GET, "/transfer").authenticated()
+                                .requestMatchers(POST, "/transfer").authenticated()
                                 .anyRequest().authenticated())
                 .formLogin(formLogin -> formLogin
                         .loginPage("/login")

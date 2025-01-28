@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import org.hibernate.annotations.ColumnDefault;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 
 @Entity
@@ -34,6 +35,10 @@ public class User {
     @NotNull
     @Column(name = "adress", nullable = false)
     private String adress;
+
+    @NotNull
+    @Column(name = "balance", nullable = false, precision = 10, scale = 2)
+    private BigDecimal balance;
 
     @ColumnDefault("CURRENT_TIMESTAMP")
     @NotNull
@@ -82,6 +87,14 @@ public class User {
 
     public void setAdress(String adress) {
         this.adress = adress;
+    }
+
+    public BigDecimal getBalance() {
+        return balance;
+    }
+
+    public void setBalance(BigDecimal balance) {
+        this.balance = balance;
     }
 
     public Instant getCreatedAt() {

@@ -20,6 +20,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 
 @Service
@@ -56,6 +57,7 @@ public class AuthService {
         user.setAdress(requestDto.address());
         user.setCreatedAt(Instant.now());
         user.setUpdatedAt(Instant.now());
+        user.setBalance(new BigDecimal("100.00"));
         User savedUser = userRepository.save(user);
 
         UserCredential userCredential = new UserCredential();
