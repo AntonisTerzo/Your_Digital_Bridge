@@ -76,6 +76,8 @@ public class Security {
                                 .requestMatchers(GET, "/register").permitAll()
                                 .requestMatchers(POST, "/api/auth/register").permitAll()
                                 .requestMatchers(POST, "/api/auth/login").permitAll()
+                                .requestMatchers("/oauth2/**").permitAll()
+                                .requestMatchers("/error").permitAll()
                                 .requestMatchers(GET, "/me").authenticated()
                                 .requestMatchers(POST, "/api/transactions/transfer").authenticated()
                                 .requestMatchers(GET, "/transfer").authenticated()
@@ -92,13 +94,20 @@ public class Security {
                         })
                         .failureUrl("/login?error")
                         .permitAll())
-                .sessionManagement(session ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .oauth2Login(Customizer.withDefaults())
-                .exceptionHandling((exceptions) -> exceptions
+                .oauth2Login(oauth2 -> oauth2
+                        .loginPage("/login")
+                        .defaultSuccessUrl("/me", true)
+                        .permitAll())
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .exceptionHandling(exceptions -> exceptions
                         .defaultAuthenticationEntryPointFor(
-                                new LoginUrlAuthenticationEntryPoint("/oauth2/authorization/github"),
+                                new LoginUrlAuthenticationEntryPoint("/login"),
                                 new MediaTypeRequestMatcher(MediaType.TEXT_HTML)
                         ));
+
+        http.authenticationProvider(authenticationProvider());
+        http.addFilterBefore(authJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();
-    }}
+    }
+}
