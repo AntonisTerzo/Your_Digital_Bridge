@@ -2,15 +2,15 @@ package dev.antonis.your_digital_bridge.security;
 
 import dev.antonis.your_digital_bridge.security.jwt.AuthTokenFilter;
 import dev.antonis.your_digital_bridge.security.jwt.JwtUtils;
+import dev.antonis.your_digital_bridge.security.oauth2.CustomOauth2UserService;
+import dev.antonis.your_digital_bridge.security.oauth2.Oauth2AuthenticationSuccessHandler;
 import dev.antonis.your_digital_bridge.user.UserDetailsImpl;
 import dev.antonis.your_digital_bridge.user.UserDetailsServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -19,11 +19,8 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.http.ResponseCookie;
-import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
-import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher;
 
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
@@ -34,10 +31,14 @@ public class Security {
 
     private final JwtUtils jtwUtils;
     private final UserDetailsServiceImpl userDetailsServiceImpl;
+    private final CustomOauth2UserService customOauth2UserService;
+    private final Oauth2AuthenticationSuccessHandler oauth2AuthenticationSuccessHandler;
 
-    public Security(JwtUtils jtwUtils, UserDetailsServiceImpl userDetailsServiceImpl) {
+    public Security(JwtUtils jtwUtils, UserDetailsServiceImpl userDetailsServiceImpl, CustomOauth2UserService customOauth2UserService, Oauth2AuthenticationSuccessHandler oauth2AuthenticationSuccessHandler) {
         this.jtwUtils = jtwUtils;
         this.userDetailsServiceImpl = userDetailsServiceImpl;
+        this.customOauth2UserService = customOauth2UserService;
+        this.oauth2AuthenticationSuccessHandler = oauth2AuthenticationSuccessHandler;
     }
 
     @Bean
@@ -96,15 +97,14 @@ public class Security {
                         .permitAll())
                 .oauth2Login(oauth2 -> oauth2
                         .loginPage("/login")
-                        .defaultSuccessUrl("/me", true)
-                        .permitAll())
+                        .userInfoEndpoint(userInfo -> userInfo
+                                .userService(customOauth2UserService))
+                        .defaultSuccessUrl("/user-page")
+                        .successHandler(oauth2AuthenticationSuccessHandler))
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .exceptionHandling(exceptions -> exceptions
-                        .defaultAuthenticationEntryPointFor(
-                                new LoginUrlAuthenticationEntryPoint("/login"),
-                                new MediaTypeRequestMatcher(MediaType.TEXT_HTML)
-                        ));
+                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint(new CustomAuthenticationEntryPoint()));
 
         http.authenticationProvider(authenticationProvider());
         http.addFilterBefore(authJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
