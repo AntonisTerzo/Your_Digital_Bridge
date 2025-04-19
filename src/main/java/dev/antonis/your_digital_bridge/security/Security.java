@@ -101,6 +101,12 @@ public class Security {
                                 .userService(customOauth2UserService))
                         .defaultSuccessUrl("/user-page")
                         .successHandler(oauth2AuthenticationSuccessHandler))
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/?logout")
+                        .invalidateHttpSession(true)
+                        .clearAuthentication(true)
+                        .deleteCookies("JWT", "JSESSIONID"))
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
                 .exceptionHandling(exception -> exception
