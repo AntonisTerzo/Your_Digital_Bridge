@@ -5,36 +5,30 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import org.hibernate.annotations.ColumnDefault;
 
-import java.math.BigDecimal;
 import java.time.Instant;
 
 @Entity
 @Table(name = "social_login_credentials", schema = "mydatabase")
-public class SocialLoginCredentials {
+public class SocialLoginCredential {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Integer id;
 
-    @Size(max = 255)
     @NotNull
-    @Column(name = "github_id", nullable = false, unique = true)
-    private String githubId;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
+    @Size(max = 50)
+    @NotNull
+    @Column(name = "provider", nullable = false, length = 50)
+    private String provider;
 
     @Size(max = 255)
     @NotNull
-    @Column(name = "name", nullable = false, unique = true)
-    private String name;
-
-    @Size(max = 255)
-    @NotNull
-    @Column(name = "email", nullable = false, unique = true)
-    private String email;
-
-    @NotNull
-    @ColumnDefault("100.00")
-    @Column(name = "balance", nullable = false, precision = 10, scale = 2)
-    private BigDecimal balance;
+    @Column(name = "provider_id", nullable = false, unique = true)
+    private String providerId;
 
     @NotNull
     @ColumnDefault("CURRENT_TIMESTAMP")
@@ -45,6 +39,14 @@ public class SocialLoginCredentials {
     @Column(name = "updated_at")
     private Instant updatedAt;
 
+    public SocialLoginCredential() {}
+
+    public  SocialLoginCredential(User user, String provider, String providerId) {
+        this.user = user;
+        this.provider = provider;
+        this.providerId = providerId;
+    }
+
     public Integer getId() {
         return id;
     }
@@ -53,36 +55,28 @@ public class SocialLoginCredentials {
         this.id = id;
     }
 
-    public String getGithubId() {
-        return githubId;
+    public dev.antonis.your_digital_bridge.entity.User getUser() {
+        return user;
     }
 
-    public void setGithubId(String githubId) {
-        this.githubId = githubId;
+    public void setUser(dev.antonis.your_digital_bridge.entity.User user) {
+        this.user = user;
     }
 
-    public String getName() {
-        return name;
+    public String getProvider() {
+        return provider;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setProvider(String provider) {
+        this.provider = provider;
     }
 
-    public String getEmail() {
-        return email;
+    public String getProviderId() {
+        return providerId;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public BigDecimal getBalance() {
-        return balance;
-    }
-
-    public void setBalance(BigDecimal balance) {
-        this.balance = balance;
+    public void setProviderId(String providerId) {
+        this.providerId = providerId;
     }
 
     public Instant getCreatedAt() {

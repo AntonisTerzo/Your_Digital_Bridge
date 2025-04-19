@@ -12,12 +12,12 @@ import java.time.Instant;
 public class UserCredential {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false, updatable = false)
+    @Column(name = "id", nullable = false)
     private Integer id;
 
     @Size(max = 255)
     @NotNull
-    @Column(name = "username", nullable = false, unique = true)
+    @Column(name = "username", nullable = false)
     private String username;
 
     @Size(max = 255)
@@ -30,9 +30,9 @@ public class UserCredential {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ColumnDefault("CURRENT_TIMESTAMP")
     @NotNull
-    @Column(name = "created_at", nullable = false, updatable = false)
+    @ColumnDefault("CURRENT_TIMESTAMP")
+    @Column(name = "created_at", nullable = false)
     private Instant createdAt;
 
     @ColumnDefault("CURRENT_TIMESTAMP")
@@ -86,4 +86,5 @@ public class UserCredential {
     public void setUpdatedAt(Instant updatedAt) {
         this.updatedAt = updatedAt;
     }
+
 }
