@@ -26,14 +26,14 @@ public class Oauth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
                                         Authentication authentication) throws IOException, ServletException {
         DefaultOAuth2User oauthUser = (DefaultOAuth2User) authentication.getPrincipal();
         String username = (String) oauthUser.getAttributes().get("login");
-        
+
         String token = jwtProvider.generateTokenFromUsername(username);
         Cookie jwtCookie = new Cookie("JWT", token);
         jwtCookie.setHttpOnly(true);
         jwtCookie.setMaxAge(24 * 60 * 60);
         jwtCookie.setPath("/");
         response.addCookie(jwtCookie);
-        
+
         // Explicitly redirect to the secured page ("/me")
         response.sendRedirect("/me");
 

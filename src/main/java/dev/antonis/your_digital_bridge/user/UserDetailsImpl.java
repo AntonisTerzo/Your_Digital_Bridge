@@ -1,7 +1,6 @@
 package dev.antonis.your_digital_bridge.user;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import dev.antonis.your_digital_bridge.entity.SocialLoginCredentials;
 import dev.antonis.your_digital_bridge.entity.UserCredential;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -27,15 +26,6 @@ public class UserDetailsImpl implements UserDetails {
                 userCredential.getUser().getId(),
                 userCredential.getUsername(),
                 userCredential.getPassword());
-    }
-
-    // Added overloaded build method to support SocialLoginCredentials
-    public static UserDetailsImpl build(SocialLoginCredentials credentials) {
-        return new UserDetailsImpl(
-                credentials.getId(),             // use the social login credentials' id
-                credentials.getName(),           // use GitHub login (name) as username
-                ""                             // no password for social logins
-        );
     }
 
     @Override
