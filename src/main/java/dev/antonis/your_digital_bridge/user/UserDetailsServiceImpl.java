@@ -7,6 +7,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Service
 public class UserDetailsServiceImpl implements org.springframework.security.core.userdetails.UserDetailsService {
     private final UserCredentialRepository userCredentialRepository;
@@ -17,8 +19,15 @@ public class UserDetailsServiceImpl implements org.springframework.security.core
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        UserCredential user = userCredentialRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with username " + username));
-        return UserDetailsImpl.build(user);
+        // Trim the username to remove any leading/trailing whitespace
+        username = username.trim();
+        // Look up the user using local credentials
+        Optional<UserCredential> localUser = userCredentialRepository.findByUsername(username);
+        if (localUser.isPresent()) {
+            return UserDetailsImpl.build(localUser.get());
+        }
+
+
+        throw new UsernameNotFoundException("User not found with username " + username);
     }
 }

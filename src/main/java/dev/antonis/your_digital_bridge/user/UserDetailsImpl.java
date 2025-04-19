@@ -23,7 +23,7 @@ public class UserDetailsImpl implements UserDetails {
 
     public static UserDetailsImpl build(UserCredential userCredential) {
         return new UserDetailsImpl(
-                userCredential.getId(),
+                userCredential.getUser().getId(),
                 userCredential.getUsername(),
                 userCredential.getPassword());
     }

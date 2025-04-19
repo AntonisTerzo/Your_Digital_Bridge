@@ -12,26 +12,26 @@ import java.time.Instant;
 public class Transaction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false, updatable = false)
+    @Column(name = "id", nullable = false)
     private Integer id;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "sender_id", nullable = false)
-    private User sender;
+    private dev.antonis.your_digital_bridge.entity.User sender;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "receiver_id", nullable = false)
-    private User receiver;
+    private dev.antonis.your_digital_bridge.entity.User receiver;
 
     @NotNull
     @Column(name = "amount", nullable = false, precision = 10, scale = 2)
     private BigDecimal amount;
 
-    @ColumnDefault("CURRENT_TIMESTAMP")
     @NotNull
-    @Column(name = "timestamp", nullable = false, updatable = false)
+    @ColumnDefault("CURRENT_TIMESTAMP")
+    @Column(name = "timestamp", nullable = false)
     private Instant timestamp;
 
     public Integer getId() {
@@ -42,19 +42,19 @@ public class Transaction {
         this.id = id;
     }
 
-    public User getSender() {
+    public dev.antonis.your_digital_bridge.entity.User getSender() {
         return sender;
     }
 
-    public void setSender(User sender) {
+    public void setSender(dev.antonis.your_digital_bridge.entity.User sender) {
         this.sender = sender;
     }
 
-    public User getReceiver() {
+    public dev.antonis.your_digital_bridge.entity.User getReceiver() {
         return receiver;
     }
 
-    public void setReceiver(User receiver) {
+    public void setReceiver(dev.antonis.your_digital_bridge.entity.User receiver) {
         this.receiver = receiver;
     }
 

@@ -7,47 +7,50 @@ import org.hibernate.annotations.ColumnDefault;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "user", schema = "mydatabase")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false, updatable = false)
+    @Column(name = "id", nullable = false)
     private Integer id;
 
     @Size(max = 255)
     @NotNull
-    @Column(name = "first_name", nullable = false)
-    private String firstName;
+    @Column(name = "full_name", nullable = false)
+    private String fullName;
 
     @Size(max = 255)
     @NotNull
-    @Column(name = "last_name", nullable = false)
-    private String lastName;
-
-    @Size(max = 255)
-    @NotNull
-    @Column(name = "email", nullable = false, unique = true)
+    @Column(name = "email", nullable = false)
     private String email;
 
     @Size(max = 255)
-    @NotNull
-    @Column(name = "adress", nullable = false)
+    @Column(name = "adress")
     private String adress;
 
     @NotNull
+    @ColumnDefault("100.00")
     @Column(name = "balance", nullable = false, precision = 10, scale = 2)
     private BigDecimal balance;
 
-    @ColumnDefault("CURRENT_TIMESTAMP")
     @NotNull
-    @Column(name = "created_at", nullable = false, updatable = false)
+    @ColumnDefault("CURRENT_TIMESTAMP")
+    @Column(name = "created_at", nullable = false)
     private Instant createdAt;
 
     @ColumnDefault("CURRENT_TIMESTAMP")
     @Column(name = "updated_at")
     private Instant updatedAt;
+
+    @OneToMany(mappedBy = "user")
+    private Set<SocialLoginCredential> socialLoginCredentials = new LinkedHashSet<>();
+
+    @OneToMany(mappedBy = "user")
+    private Set<dev.antonis.your_digital_bridge.entity.UserCredential> userCredentials = new LinkedHashSet<>();
 
     public Integer getId() {
         return id;
@@ -57,20 +60,12 @@ public class User {
         this.id = id;
     }
 
-    public String getFirstName() {
-        return firstName;
+    public String getFullName() {
+        return fullName;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 
     public String getEmail() {
@@ -112,4 +107,21 @@ public class User {
     public void setUpdatedAt(Instant updatedAt) {
         this.updatedAt = updatedAt;
     }
+
+    public Set<SocialLoginCredential> getSocialLoginCredentials() {
+        return socialLoginCredentials;
+    }
+
+    public void setSocialLoginCredentials(Set<SocialLoginCredential> socialLoginCredentials) {
+        this.socialLoginCredentials = socialLoginCredentials;
+    }
+
+    public Set<dev.antonis.your_digital_bridge.entity.UserCredential> getUserCredentials() {
+        return userCredentials;
+    }
+
+    public void setUserCredentials(Set<dev.antonis.your_digital_bridge.entity.UserCredential> userCredentials) {
+        this.userCredentials = userCredentials;
+    }
+
 }

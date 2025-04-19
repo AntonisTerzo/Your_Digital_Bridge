@@ -13,7 +13,7 @@
             <h1>Welcome to Your Page</h1>
         </div>
         <div class="card-body">
-            <p>Hello, <span th:text="${firstName + ' ' + lastName}">User Name</span>!</p>
+            <p>Hello, <span th:text="${fullName}">UserName</span>!</p>
             <p>Your current balance: €<span th:text="${balance}">100.00</span></p>
             
             <a href="/transfer" class="btn btn-primary">Make a Transfer</a>

@@ -2,6 +2,8 @@ package dev.antonis.your_digital_bridge.security;
 
 import dev.antonis.your_digital_bridge.security.jwt.AuthTokenFilter;
 import dev.antonis.your_digital_bridge.security.jwt.JwtUtils;
+import dev.antonis.your_digital_bridge.security.oauth2.CustomOauth2UserService;
+import dev.antonis.your_digital_bridge.security.oauth2.Oauth2AuthenticationSuccessHandler;
 import dev.antonis.your_digital_bridge.user.UserDetailsImpl;
 import dev.antonis.your_digital_bridge.user.UserDetailsServiceImpl;
 import org.springframework.context.annotation.Bean;
@@ -29,10 +31,14 @@ public class Security {
 
     private final JwtUtils jtwUtils;
     private final UserDetailsServiceImpl userDetailsServiceImpl;
+    private final CustomOauth2UserService customOauth2UserService;
+    private final Oauth2AuthenticationSuccessHandler oauth2AuthenticationSuccessHandler;
 
-    public Security(JwtUtils jtwUtils, UserDetailsServiceImpl userDetailsServiceImpl) {
+    public Security(JwtUtils jtwUtils, UserDetailsServiceImpl userDetailsServiceImpl, CustomOauth2UserService customOauth2UserService, Oauth2AuthenticationSuccessHandler oauth2AuthenticationSuccessHandler) {
         this.jtwUtils = jtwUtils;
         this.userDetailsServiceImpl = userDetailsServiceImpl;
+        this.customOauth2UserService = customOauth2UserService;
+        this.oauth2AuthenticationSuccessHandler = oauth2AuthenticationSuccessHandler;
     }
 
     @Bean
@@ -71,6 +77,8 @@ public class Security {
                                 .requestMatchers(GET, "/register").permitAll()
                                 .requestMatchers(POST, "/api/auth/register").permitAll()
                                 .requestMatchers(POST, "/api/auth/login").permitAll()
+                                .requestMatchers("/oauth2/**").permitAll()
+                                .requestMatchers("/error").permitAll()
                                 .requestMatchers(GET, "/me").authenticated()
                                 .requestMatchers(POST, "/api/transactions/transfer").authenticated()
                                 .requestMatchers(GET, "/transfer").authenticated()
@@ -87,10 +95,16 @@ public class Security {
                         })
                         .failureUrl("/login?error")
                         .permitAll())
-                .sessionManagement(session ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .exceptionHandling(exception ->
-                        exception.authenticationEntryPoint(new CustomAuthenticationEntryPoint()));
+                .oauth2Login(oauth2 -> oauth2
+                        .loginPage("/login")
+                        .userInfoEndpoint(userInfo -> userInfo
+                                .userService(customOauth2UserService))
+                        .defaultSuccessUrl("/user-page")
+                        .successHandler(oauth2AuthenticationSuccessHandler))
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint(new CustomAuthenticationEntryPoint()));
 
         http.authenticationProvider(authenticationProvider());
         http.addFilterBefore(authJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);

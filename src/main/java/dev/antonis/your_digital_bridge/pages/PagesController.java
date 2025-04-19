@@ -2,11 +2,15 @@ package dev.antonis.your_digital_bridge.pages;
 
 import dev.antonis.your_digital_bridge.entity.User;
 import dev.antonis.your_digital_bridge.entity.UserCredential;
+import dev.antonis.your_digital_bridge.entity.SocialLoginCredential;
 import dev.antonis.your_digital_bridge.transaction.TransactionService;
 import dev.antonis.your_digital_bridge.transaction.dto.TransactionRequestDto;
 import dev.antonis.your_digital_bridge.user.repository.UserCredentialRepository;
+import dev.antonis.your_digital_bridge.user.repository.SocialLoginRepository;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,14 +19,20 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.math.BigDecimal;
+import java.util.Map;
+import java.util.Optional;
 
 @Controller
 public class PagesController {
     private final UserCredentialRepository userCredentialRepository;
+    private final SocialLoginRepository socialLoginRepository;
     private final TransactionService transactionService;
 
-    public PagesController(UserCredentialRepository userCredentialRepository, TransactionService transactionService) {
+    public PagesController(UserCredentialRepository userCredentialRepository,
+                           SocialLoginRepository socialLoginRepository,
+                           TransactionService transactionService) {
         this.userCredentialRepository = userCredentialRepository;
+        this.socialLoginRepository = socialLoginRepository;
         this.transactionService = transactionService;
     }
 
@@ -38,28 +48,17 @@ public class PagesController {
 
     @GetMapping("/me")
     public String getUserPage(Model model) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
-        
-        UserCredential userCredential = userCredentialRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-        User user = userCredential.getUser();
-        
-        model.addAttribute("firstName", user.getFirstName());
-        model.addAttribute("lastName", user.getLastName());
+        User user = getUserFromAuthentication().orElseThrow(() ->
+                new UsernameNotFoundException("User not found"));;
+        model.addAttribute("fullName", user.getFullName());
         model.addAttribute("balance", user.getBalance());
         return "user-page";
     }
 
     @GetMapping("/transfer")
     public String getTransferPage(Model model) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
-        
-        UserCredential userCredential = userCredentialRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-        User user = userCredential.getUser();
-        
+        User user = getUserFromAuthentication().orElseThrow(() ->
+                new UsernameNotFoundException("User not found"));
         model.addAttribute("balance", user.getBalance());
         return "transfer";
     }
@@ -70,16 +69,13 @@ public class PagesController {
             @RequestParam BigDecimal amount,
             RedirectAttributes redirectAttributes) {
         try {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            String username = authentication.getName();
-            UserCredential userCredential = userCredentialRepository.findByUsername(username)
-                    .orElseThrow(() -> new RuntimeException("User not found"));
-
+            User user = getUserFromAuthentication().orElseThrow(() ->
+                    new UsernameNotFoundException("User not found"));;
             TransactionRequestDto request = new TransactionRequestDto(receiverEmail, amount);
-            transactionService.transferMoney(userCredential.getUser().getId(), request);
-            
-            redirectAttributes.addFlashAttribute("success", 
-                "Successfully transferred €" + amount + " to " + receiverEmail);
+            transactionService.transferMoney(user.getId(), request);
+
+            redirectAttributes.addFlashAttribute("success",
+                    "Successfully transferred €" + amount + " to " + receiverEmail);
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
@@ -90,4 +86,32 @@ public class PagesController {
     public String getRegisterPage() {
         return "register";
     }
-}
+
+    /**
+     * Helper method to retrieve the User entity from the current Authentication.
+     * Tries both regular and social login methods.
+     */
+    private Optional<User> getUserFromAuthentication() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+
+        // 1) Try regular login
+        return userCredentialRepository.findByUsername(username)
+                .map(UserCredential::getUser)
+                // 2) Otherwise try social login
+                .or(() -> {
+                    if (authentication instanceof OAuth2AuthenticationToken oauthToken) {
+                        String provider = oauthToken.getAuthorizedClientRegistrationId();
+                        Map<String, Object> attrs = oauthToken.getPrincipal().getAttributes();
+
+                        if ("github".equals(provider) && attrs.containsKey("id")) {
+                            String providerId = attrs.get("id").toString();
+                            return socialLoginRepository
+                                    .findByProviderAndProviderId(provider, providerId)
+                                    .map(SocialLoginCredential::getUser);
+                        }
+                    }
+                    return Optional.empty();
+                });
+    }}
+

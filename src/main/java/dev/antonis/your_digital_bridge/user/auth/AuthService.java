@@ -6,10 +6,10 @@ import dev.antonis.your_digital_bridge.security.jwt.JwtUtils;
 import dev.antonis.your_digital_bridge.user.UserDetailsImpl;
 import dev.antonis.your_digital_bridge.user.dto.LoginRequestDto;
 import dev.antonis.your_digital_bridge.user.dto.LoginResponseDto;
+import dev.antonis.your_digital_bridge.user.dto.RegisterUserRequestDto;
 import dev.antonis.your_digital_bridge.user.dto.RegisterUserResponseDto;
 import dev.antonis.your_digital_bridge.user.repository.UserCredentialRepository;
 import dev.antonis.your_digital_bridge.user.repository.UserRepository;
-import dev.antonis.your_digital_bridge.user.dto.RegisterUserRequestDto;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -51,8 +51,7 @@ public class AuthService {
         }
 
         User user = new User();
-        user.setFirstName(requestDto.firstName());
-        user.setLastName(requestDto.lastName());
+        user.setFullName(requestDto.fullName());
         user.setEmail(requestDto.email());
         user.setAdress(requestDto.address());
         user.setCreatedAt(Instant.now());
