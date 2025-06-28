@@ -5,9 +5,12 @@ import dev.antonis.your_digital_bridge.entity.UserCredential;
 import dev.antonis.your_digital_bridge.entity.SocialLoginCredential;
 import dev.antonis.your_digital_bridge.transaction.TransactionService;
 import dev.antonis.your_digital_bridge.transaction.dto.TransactionRequestDto;
+import dev.antonis.your_digital_bridge.user.UserDetailsImpl;
 import dev.antonis.your_digital_bridge.user.repository.UserCredentialRepository;
 import dev.antonis.your_digital_bridge.user.repository.SocialLoginRepository;
+import dev.antonis.your_digital_bridge.user.repository.UserRepository;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
@@ -27,13 +30,15 @@ public class PagesController {
     private final UserCredentialRepository userCredentialRepository;
     private final SocialLoginRepository socialLoginRepository;
     private final TransactionService transactionService;
+    private final UserRepository userRepository;
 
     public PagesController(UserCredentialRepository userCredentialRepository,
                            SocialLoginRepository socialLoginRepository,
-                           TransactionService transactionService) {
+                           TransactionService transactionService, UserRepository userRepository) {
         this.userCredentialRepository = userCredentialRepository;
         this.socialLoginRepository = socialLoginRepository;
         this.transactionService = transactionService;
+        this.userRepository = userRepository;
     }
 
     @GetMapping()
@@ -47,18 +52,23 @@ public class PagesController {
     }
 
     @GetMapping("/me")
-    public String getUserPage(Model model) {
-        User user = getUserFromAuthentication().orElseThrow(() ->
-                new UsernameNotFoundException("User not found"));;
+    public String getUserPage(Model model, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        // 1. Load directly by ID (from the JWT -> UserDetails)
+        User user = userRepository.findById(userDetails.getId())
+                .orElseThrow(() ->
+                        new UsernameNotFoundException("User not found with id " + userDetails.getId())
+                );
         model.addAttribute("fullName", user.getFullName());
         model.addAttribute("balance", user.getBalance());
         return "user-page";
     }
 
     @GetMapping("/transfer")
-    public String getTransferPage(Model model) {
-        User user = getUserFromAuthentication().orElseThrow(() ->
-                new UsernameNotFoundException("User not found"));
+    public String getTransferPage(Model model, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        User user = userRepository.findById(userDetails.getId())
+                .orElseThrow(() ->
+                        new UsernameNotFoundException("User not found with id " + userDetails.getId())
+                );
         model.addAttribute("balance", user.getBalance());
         return "transfer";
     }
@@ -67,10 +77,13 @@ public class PagesController {
     public String processTransfer(
             @RequestParam String receiverEmail,
             @RequestParam BigDecimal amount,
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
             RedirectAttributes redirectAttributes) {
         try {
-            User user = getUserFromAuthentication().orElseThrow(() ->
-                    new UsernameNotFoundException("User not found"));;
+            User user = userRepository.findById(userDetails.getId())
+                    .orElseThrow(() ->
+                            new UsernameNotFoundException("User not found with id " + userDetails.getId())
+                    );
             TransactionRequestDto request = new TransactionRequestDto(receiverEmail, amount);
             transactionService.transferMoney(user.getId(), request);
 
@@ -113,5 +126,6 @@ public class PagesController {
                     }
                     return Optional.empty();
                 });
-    }}
+    }
+}
 

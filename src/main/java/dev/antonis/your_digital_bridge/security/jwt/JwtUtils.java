@@ -39,7 +39,7 @@ public class JwtUtils {
             return null;
         }
     }
-
+    // For local users
     public ResponseCookie generateJwtCookie(UserDetailsImpl userPrincipal) {
         String jwt = generateTokenFromUsername(userPrincipal.getUsername());
         return ResponseCookie.from(jwtCookie, jwt)
@@ -49,11 +49,6 @@ public class JwtUtils {
                 .secure(true)
                 .sameSite("Strict")
                 .build();
-    }
-
-    public ResponseCookie getCleanJwtCookie() {
-        ResponseCookie cookie = ResponseCookie.from(jwtCookie, null).path("/").build();
-        return cookie;
     }
 
     public String getUserNameFromJwtToken(String token) {
