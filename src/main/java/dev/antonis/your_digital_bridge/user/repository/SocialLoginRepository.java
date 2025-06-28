@@ -10,4 +10,5 @@ import java.util.Optional;
 public interface SocialLoginRepository extends ListCrudRepository<SocialLoginCredential, Integer> {
     // Find user by provider and providerID
     Optional<SocialLoginCredential> findByProviderAndProviderId(String provider, String providerID);
+    Optional<SocialLoginCredential> findByProviderId(String providerId);
 }

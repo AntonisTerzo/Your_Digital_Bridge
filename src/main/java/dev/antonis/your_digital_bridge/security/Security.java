@@ -47,8 +47,8 @@ public class Security {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authconfig) throws Exception {
-        return authconfig.getAuthenticationManager();
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
+        return authConfig.getAuthenticationManager();
     }
 
     @Bean
@@ -99,7 +99,6 @@ public class Security {
                         .loginPage("/login")
                         .userInfoEndpoint(userInfo -> userInfo
                                 .userService(customOauth2UserService))
-                        .defaultSuccessUrl("/user-page")
                         .successHandler(oauth2AuthenticationSuccessHandler))
                 .logout(logout -> logout
                         .logoutUrl("/logout")
@@ -108,7 +107,7 @@ public class Security {
                         .clearAuthentication(true)
                         .deleteCookies("JWT", "JSESSIONID"))
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint(new CustomAuthenticationEntryPoint()));
 

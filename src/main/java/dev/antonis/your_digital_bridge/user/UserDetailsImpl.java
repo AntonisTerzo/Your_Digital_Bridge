@@ -1,6 +1,8 @@
 package dev.antonis.your_digital_bridge.user;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import dev.antonis.your_digital_bridge.entity.SocialLoginCredential;
+import dev.antonis.your_digital_bridge.entity.User;
 import dev.antonis.your_digital_bridge.entity.UserCredential;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -10,10 +12,10 @@ import java.util.Collections;
 
 public class UserDetailsImpl implements UserDetails {
 
-    private Integer id;
-    private String username;
+    private final Integer id;
+    private final String username;
     @JsonIgnore
-    private String password;
+    private final String password;
 
     public UserDetailsImpl(Integer id, String username, String password) {
         this.id = id;
@@ -26,6 +28,15 @@ public class UserDetailsImpl implements UserDetails {
                 userCredential.getUser().getId(),
                 userCredential.getUsername(),
                 userCredential.getPassword());
+    }
+
+    public  static UserDetailsImpl socialBuild(SocialLoginCredential socialLoginCredential) {
+        User user = socialLoginCredential.getUser();
+        return new UserDetailsImpl(
+                user.getId(),
+                user.getFullName(),
+                null
+        );
     }
 
     @Override
