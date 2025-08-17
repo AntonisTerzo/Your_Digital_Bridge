@@ -5,26 +5,16 @@ services:
     build: .
     ports:
       - "8080:8080"
-    depends_on:
-      - db
     environment:
       - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/mydatabase
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=verysecret
-    networks:
-      - spring-mysql-network
 
   db:
     image: mysql:9.1
     environment:
       - MYSQL_ROOT_PASSWORD=verysecret
       - MYSQL_DATABASE=mydatabase
-    ports:
-      - "3306:3306"
-    volumes:
-      - mysql-data:/var/lib/mysql
-    networks:
-      - spring-mysql-network
 
 volumes:
   mysql-data:
