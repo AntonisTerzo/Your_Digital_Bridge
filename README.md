@@ -40,8 +40,7 @@ This project is a **full-stack** prototype of a money transfer platform. It supp
 |---------------|----------------------------------------|
 | Backend       | Java, Spring Boot                      |
 | Frontend      | Thymeleaf, HTML, CSS (templates)       |
-| Authentication | OAuth2 (GitHub) +
-|                  JWT tokens for stateless auth         |
+|Authentication | OAuth2 (GitHub) + JWT tokens for stateless auth |
 | Database      | MySQL                                  |
 | Containerization | Docker                              |
 | Build Tool    | Maven (`mvn`)                          |
@@ -56,21 +55,21 @@ This project is a **full-stack** prototype of a money transfer platform. It supp
 Ensure the following are installed on your machine:
 
 - Java JDK 23  
-- Maven 3.6+ (or latest)  
+- Maven 3.9.9 (or latest)  
 - Docker (Docker Desktop)
 - (Optional) IDE such as IntelliJ IDEA, Eclipse, or VS Code  
 
 ### Setup & Run
 
 1. **Clone the repository**  
-   git clone https://github.com/AntonisTerzo/Your_Digital_Bridge.git
-   cd Your_Digital_Bridge
+   -git clone https://github.com/AntonisTerzo/Your_Digital_Bridge.git
+   -cd Your_Digital_Bridge
 2. **Build the project with maven**
-   mvn clean package
+   -mvn clean package
 3. **Run the application using Docker compose**
-   docker compose up --build
+   -docker compose up --build
 4. **Open in your browser**
-   Visit http://localhost:8080
+   -Visit http://localhost:8080
 
 ## Application Flow
 
@@ -84,7 +83,7 @@ Ensure the following are installed on your machine:
 
 ## Future Roadmap
 
-- Add 2factor authentication
+- Add Two-Factor(2fa) authentication
 - Add email notification
 - Better error handling
 - Unit tests
