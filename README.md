@@ -62,14 +62,14 @@ Ensure the following are installed on your machine:
 ### Setup & Run
 
 1. **Clone the repository**  
-   -git clone https://github.com/AntonisTerzo/Your_Digital_Bridge.git
-   -cd Your_Digital_Bridge
+   - git clone https://github.com/AntonisTerzo/Your_Digital_Bridge.git
+   - cd Your_Digital_Bridge
 2. **Build the project with maven**
-   -mvn clean package
+   - mvn clean package
 3. **Run the application using Docker compose**
-   -docker compose up --build
+   - docker compose up --build
 4. **Open in your browser**
-   -Visit http://localhost:8080
+   - Visit http://localhost:8080
 
 ## Application Flow
 
