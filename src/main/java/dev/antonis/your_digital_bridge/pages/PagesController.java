@@ -27,16 +27,12 @@ import java.util.Optional;
 
 @Controller
 public class PagesController {
-    private final UserCredentialRepository userCredentialRepository;
-    private final SocialLoginRepository socialLoginRepository;
     private final TransactionService transactionService;
     private final UserRepository userRepository;
 
     public PagesController(UserCredentialRepository userCredentialRepository,
                            SocialLoginRepository socialLoginRepository,
                            TransactionService transactionService, UserRepository userRepository) {
-        this.userCredentialRepository = userCredentialRepository;
-        this.socialLoginRepository = socialLoginRepository;
         this.transactionService = transactionService;
         this.userRepository = userRepository;
     }
@@ -98,34 +94,6 @@ public class PagesController {
     @GetMapping("/register")
     public String getRegisterPage() {
         return "register";
-    }
-
-    /**
-     * Helper method to retrieve the User entity from the current Authentication.
-     * Tries both regular and social login methods.
-     */
-    private Optional<User> getUserFromAuthentication() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
-
-        // 1) Try regular login
-        return userCredentialRepository.findByUsername(username)
-                .map(UserCredential::getUser)
-                // 2) Otherwise try social login
-                .or(() -> {
-                    if (authentication instanceof OAuth2AuthenticationToken oauthToken) {
-                        String provider = oauthToken.getAuthorizedClientRegistrationId();
-                        Map<String, Object> attrs = oauthToken.getPrincipal().getAttributes();
-
-                        if ("github".equals(provider) && attrs.containsKey("id")) {
-                            String providerId = attrs.get("id").toString();
-                            return socialLoginRepository
-                                    .findByProviderAndProviderId(provider, providerId)
-                                    .map(SocialLoginCredential::getUser);
-                        }
-                    }
-                    return Optional.empty();
-                });
     }
 }
 
