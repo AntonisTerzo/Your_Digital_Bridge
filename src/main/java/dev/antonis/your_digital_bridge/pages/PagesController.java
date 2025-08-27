@@ -56,7 +56,7 @@ public class PagesController {
         // 1. Load directly by ID (from the JWT -> UserDetails)
         User user = userRepository.findById(userDetails.getId())
                 .orElseThrow(() ->
-                        new UsernameNotFoundException("User not found with id " + userDetails.getId())
+                        new UsernameNotFoundException("User not found. Please try again")
                 );
         model.addAttribute("fullName", user.getFullName());
         model.addAttribute("balance", user.getBalance());
@@ -67,7 +67,7 @@ public class PagesController {
     public String getTransferPage(Model model, @AuthenticationPrincipal UserDetailsImpl userDetails) {
         User user = userRepository.findById(userDetails.getId())
                 .orElseThrow(() ->
-                        new UsernameNotFoundException("User not found with id " + userDetails.getId())
+                        new UsernameNotFoundException("User not found. Please try again")
                 );
         model.addAttribute("balance", user.getBalance());
         return "transfer";
@@ -82,7 +82,7 @@ public class PagesController {
         try {
             User user = userRepository.findById(userDetails.getId())
                     .orElseThrow(() ->
-                            new UsernameNotFoundException("User not found with id " + userDetails.getId())
+                            new UsernameNotFoundException("User not found. Please try again")
                     );
             TransactionRequestDto request = new TransactionRequestDto(receiverEmail, amount);
             transactionService.transferMoney(user.getId(), request);
