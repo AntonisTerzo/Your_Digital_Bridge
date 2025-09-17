@@ -1,4 +1,4 @@
-package dev.antonis.your_digital_bridge.transaction;
+package dev.antonis.your_digital_bridge.repository;
 
 import dev.antonis.your_digital_bridge.entity.Transaction;
 import org.springframework.data.repository.ListCrudRepository;

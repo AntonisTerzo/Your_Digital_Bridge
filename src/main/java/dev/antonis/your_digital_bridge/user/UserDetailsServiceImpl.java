@@ -2,8 +2,8 @@ package dev.antonis.your_digital_bridge.user;
 
 import dev.antonis.your_digital_bridge.entity.SocialLoginCredential;
 import dev.antonis.your_digital_bridge.entity.UserCredential;
-import dev.antonis.your_digital_bridge.user.repository.SocialLoginRepository;
-import dev.antonis.your_digital_bridge.user.repository.UserCredentialRepository;
+import dev.antonis.your_digital_bridge.repository.SocialLoginRepository;
+import dev.antonis.your_digital_bridge.repository.UserCredentialRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
