@@ -2,8 +2,8 @@ package dev.antonis.your_digital_bridge.security.oauth2;
 
 import dev.antonis.your_digital_bridge.entity.SocialLoginCredential;
 import dev.antonis.your_digital_bridge.entity.User;
-import dev.antonis.your_digital_bridge.user.repository.SocialLoginRepository;
-import dev.antonis.your_digital_bridge.user.repository.UserRepository;
+import dev.antonis.your_digital_bridge.repository.SocialLoginRepository;
+import dev.antonis.your_digital_bridge.repository.UserRepository;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;

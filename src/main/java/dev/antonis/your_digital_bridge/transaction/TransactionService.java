@@ -2,9 +2,15 @@ package dev.antonis.your_digital_bridge.transaction;
 
 import dev.antonis.your_digital_bridge.entity.Transaction;
 import dev.antonis.your_digital_bridge.entity.User;
+import dev.antonis.your_digital_bridge.security.exceptions.InsufficientFundsException;
+import dev.antonis.your_digital_bridge.security.exceptions.InvalidTransactionException;
+import dev.antonis.your_digital_bridge.security.exceptions.UserNotFoundException;
 import dev.antonis.your_digital_bridge.transaction.dto.TransactionRequestDto;
 import dev.antonis.your_digital_bridge.transaction.dto.TransactionResponseDto;
-import dev.antonis.your_digital_bridge.user.repository.UserRepository;
+import dev.antonis.your_digital_bridge.repository.TransactionRepository;
+import dev.antonis.your_digital_bridge.repository.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,6 +21,7 @@ import java.time.Instant;
 public class TransactionService {
     private final TransactionRepository transactionRepository;
     private final UserRepository userRepository;
+    private final Logger logger = LoggerFactory.getLogger(TransactionService.class);
 
     public TransactionService(TransactionRepository transactionRepository, UserRepository userRepository) {
         this.transactionRepository = transactionRepository;
@@ -23,24 +30,33 @@ public class TransactionService {
 
     @Transactional
     public TransactionResponseDto transferMoney(Integer senderId, TransactionRequestDto request) {
+        //Null checks
+        if (request == null || request.amount() == null || request.receiverEmail() == null) {
+            throw new InvalidTransactionException("Invalid transfer request");
+        }
+
         User sender = userRepository.findById(senderId)
-                .orElseThrow(() -> new RuntimeException("Sender not found"));
+                .orElseThrow(() -> new UserNotFoundException("Sender not found"));
         
         User receiver = userRepository.findByEmail(request.receiverEmail())
-                .orElseThrow(() -> new RuntimeException("Receiver not found with email: " + request.receiverEmail()));
+                .orElseThrow(() -> new UserNotFoundException("Receiver not found. Please add a valid receiver."));
 
         if (sender.getId().equals(receiver.getId())) {
-            throw new IllegalArgumentException("Cannot transfer money to yourself");
+            throw new InvalidTransactionException("Cannot transfer money to yourself");
         }
 
         BigDecimal amount = request.amount();
-        
+
         if (amount.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new IllegalArgumentException("Amount must be positive");
+            throw new InvalidTransactionException("Amount must be positive");
         }
-        
+
+        if (sender.getBalance() == null || receiver.getBalance() == null) {
+            throw new InvalidTransactionException("Account balances are unavailable");
+        }
+
         if (sender.getBalance().compareTo(amount) < 0) {
-            throw new IllegalArgumentException("Insufficient funds");
+            throw new InsufficientFundsException("Insufficient funds");
         }
 
         // Update balances
@@ -55,6 +71,9 @@ public class TransactionService {
         transaction.setTimestamp(Instant.now());
 
         Transaction savedTransaction = transactionRepository.save(transaction);
+
+        logger.info("Transfer successful: transactionId={}, from={} to ={} amount={}",
+                savedTransaction.getId(), sender.getEmail(), receiver.getEmail(), amount);
 
         return new TransactionResponseDto(
             savedTransaction.getId(),

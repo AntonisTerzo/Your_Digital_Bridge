@@ -1,4 +1,4 @@
-package dev.antonis.your_digital_bridge.user.repository;
+package dev.antonis.your_digital_bridge.repository;
 
 import dev.antonis.your_digital_bridge.entity.SocialLoginCredential;
 import org.springframework.data.repository.ListCrudRepository;
