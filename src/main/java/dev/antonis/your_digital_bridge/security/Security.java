@@ -22,8 +22,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.http.ResponseCookie;
 
-import static org.springframework.http.HttpMethod.GET;
-import static org.springframework.http.HttpMethod.POST;
+import static org.springframework.http.HttpMethod.*;
 
 @Configuration
 @EnableMethodSecurity
@@ -82,7 +81,7 @@ public class Security {
                                 .requestMatchers(GET, "/me").authenticated()
                                 .requestMatchers(POST, "/api/transactions/transfer").authenticated()
                                 .requestMatchers(GET, "/transfer").authenticated()
-                                .requestMatchers(POST, "/transfer").authenticated()
+                                .requestMatchers(PUT, "/transfer").authenticated()
                                 .anyRequest().authenticated())
                 .formLogin(formLogin -> formLogin
                         .loginPage("/login")
