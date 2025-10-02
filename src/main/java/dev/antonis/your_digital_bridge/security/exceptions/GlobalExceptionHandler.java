@@ -2,6 +2,11 @@ package dev.antonis.your_digital_bridge.security.exceptions;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ProblemDetail;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -28,10 +33,17 @@ public class GlobalExceptionHandler {
         return "redirect:/transfer";
     }
 
+    @ExceptionHandler(RateLimitExceededException.class)
+    public String handleRateLimitExceeded(RateLimitExceededException ex, RedirectAttributes ra) {
+        logger.warn("Rate limit exceeded: {}", ex.getMessage());
+        ra.addFlashAttribute("error", ex.getMessage());
+        return "redirect:/transfer";
+    }
+
     @ExceptionHandler(Exception.class)
     public String handleUnexpected(Exception ex, RedirectAttributes ra) {
         logger.error("Unexpected error in controller", ex);
         ra.addFlashAttribute("error", "An unexpected error occurred. Please try again later.");
-        return "redirect:/transfer";
+        return "redirect:/me";
     }
 }
