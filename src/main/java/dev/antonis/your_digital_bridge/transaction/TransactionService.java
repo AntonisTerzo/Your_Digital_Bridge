@@ -5,6 +5,7 @@ import dev.antonis.your_digital_bridge.entity.User;
 import dev.antonis.your_digital_bridge.security.exceptions.InsufficientFundsException;
 import dev.antonis.your_digital_bridge.security.exceptions.InvalidTransactionException;
 import dev.antonis.your_digital_bridge.security.exceptions.UserNotFoundException;
+import dev.antonis.your_digital_bridge.security.rateLimiting.RedisRateLimitingService;
 import dev.antonis.your_digital_bridge.transaction.dto.TransactionRequestDto;
 import dev.antonis.your_digital_bridge.transaction.dto.TransactionResponseDto;
 import dev.antonis.your_digital_bridge.repository.TransactionRepository;
@@ -21,15 +22,22 @@ import java.time.Instant;
 public class TransactionService {
     private final TransactionRepository transactionRepository;
     private final UserRepository userRepository;
+    private final RedisRateLimitingService redisRateLimitingService;
     private final Logger logger = LoggerFactory.getLogger(TransactionService.class);
 
-    public TransactionService(TransactionRepository transactionRepository, UserRepository userRepository) {
+    public TransactionService(TransactionRepository transactionRepository,
+                              UserRepository userRepository,
+                              RedisRateLimitingService redisRateLimitingService) {
         this.transactionRepository = transactionRepository;
         this.userRepository = userRepository;
+        this.redisRateLimitingService = redisRateLimitingService;
     }
 
     @Transactional
     public TransactionResponseDto transferMoney(Integer senderId, TransactionRequestDto request) {
+        // Check rate limit FIRST, before any expensive operations
+        redisRateLimitingService.checkRateLimit(senderId);
+
         //Null checks
         if (request == null || request.amount() == null || request.receiverEmail() == null) {
             throw new InvalidTransactionException("Invalid transfer request");

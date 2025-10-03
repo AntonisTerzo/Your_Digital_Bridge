@@ -12,7 +12,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -68,7 +68,7 @@ public class PagesController {
         }
     }
 
-    @PutMapping("/transfer")
+    @PostMapping("/transfer")
     public String processTransfer(
             @RequestParam String receiverEmail,
             @RequestParam BigDecimal amount,
