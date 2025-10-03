@@ -79,9 +79,8 @@ public class Security {
                                 .requestMatchers("/oauth2/**").permitAll()
                                 .requestMatchers("/error").permitAll()
                                 .requestMatchers(GET, "/me").authenticated()
-                                .requestMatchers(POST, "/api/transactions/transfer").authenticated()
                                 .requestMatchers(GET, "/transfer").authenticated()
-                                .requestMatchers(PUT, "/transfer").authenticated()
+                                .requestMatchers(POST, "/transfer").authenticated()
                                 .anyRequest().authenticated())
                 .formLogin(formLogin -> formLogin
                         .loginPage("/login")

@@ -34,7 +34,7 @@ public class TransactionService {
     }
 
     @Transactional
-    public TransactionResponseDto transferMoney(Integer senderId, TransactionRequestDto request) {
+    public void transferMoney(Integer senderId, TransactionRequestDto request) {
         // Check rate limit FIRST, before any expensive operations
         redisRateLimitingService.checkRateLimit(senderId);
 
@@ -83,12 +83,12 @@ public class TransactionService {
         logger.info("Transfer successful: transactionId={}, from={} to ={} amount={}",
                 savedTransaction.getId(), sender.getEmail(), receiver.getEmail(), amount);
 
-        return new TransactionResponseDto(
-            savedTransaction.getId(),
-            sender.getEmail(),
-            receiver.getEmail(),
-            amount,
-            savedTransaction.getTimestamp()
+        new TransactionResponseDto(
+                savedTransaction.getId(),
+                sender.getEmail(),
+                receiver.getEmail(),
+                amount,
+                savedTransaction.getTimestamp()
         );
     }
 } 

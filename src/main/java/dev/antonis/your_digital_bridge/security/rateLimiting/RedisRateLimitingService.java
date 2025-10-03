@@ -49,7 +49,7 @@ public class RedisRateLimitingService {
         if (count > rateLimitProperties.getMaxTransfers()) {
             Long ttl = redisTemplate.getExpire(key);
             throw new RateLimitExceededException(
-                    String.format("Rate limit exceeded. Maximum %d transfers allowed per %d minutes. Try again in %d seconds.",
+                    String.format("Rate limit exceeded. Maximum %d transfers allowed per %d minute. Try again in %d seconds.",
                             rateLimitProperties.getMaxTransfers(),
                             rateLimitProperties.getWindowSizeMinutes(),
                             ttl != null ? ttl : 0)
