@@ -22,8 +22,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.http.ResponseCookie;
 
-import static org.springframework.http.HttpMethod.GET;
-import static org.springframework.http.HttpMethod.POST;
+import static org.springframework.http.HttpMethod.*;
 
 @Configuration
 @EnableMethodSecurity
@@ -80,7 +79,6 @@ public class Security {
                                 .requestMatchers("/oauth2/**").permitAll()
                                 .requestMatchers("/error").permitAll()
                                 .requestMatchers(GET, "/me").authenticated()
-                                .requestMatchers(POST, "/api/transactions/transfer").authenticated()
                                 .requestMatchers(GET, "/transfer").authenticated()
                                 .requestMatchers(POST, "/transfer").authenticated()
                                 .anyRequest().authenticated())

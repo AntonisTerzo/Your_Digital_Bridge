@@ -28,6 +28,13 @@ public class GlobalExceptionHandler {
         return "redirect:/transfer";
     }
 
+    @ExceptionHandler(RateLimitExceededException.class)
+    public String handleRateLimitExceeded(RateLimitExceededException ex, RedirectAttributes ra) {
+        logger.warn("Rate limit exceeded: {}", ex.getMessage());
+        ra.addFlashAttribute("error", ex.getMessage());
+        return "redirect:/transfer";
+    }
+
     @ExceptionHandler(Exception.class)
     public String handleUnexpected(Exception ex, RedirectAttributes ra) {
         logger.error("Unexpected error in controller", ex);

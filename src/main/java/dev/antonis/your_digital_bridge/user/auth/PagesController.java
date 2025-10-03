@@ -1,10 +1,10 @@
-package dev.antonis.your_digital_bridge.pages;
+package dev.antonis.your_digital_bridge.user.auth;
 
 import dev.antonis.your_digital_bridge.entity.User;
 import dev.antonis.your_digital_bridge.transaction.TransactionService;
 import dev.antonis.your_digital_bridge.transaction.dto.TransactionRequestDto;
-import dev.antonis.your_digital_bridge.user.UserDetailsImpl;
 import dev.antonis.your_digital_bridge.repository.UserRepository;
+import dev.antonis.your_digital_bridge.user.UserDetailsImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
